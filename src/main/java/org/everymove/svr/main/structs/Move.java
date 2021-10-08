@@ -7,7 +7,6 @@ import java.util.List;
  */
 public class Move 
 {
-
     private String startingPosition;
 
     private String endingPosition;
