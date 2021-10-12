@@ -30,7 +30,7 @@ public class MovesAPI
         this.moves = moves;
     }
 
-    @PutMapping
+    @PutMapping("/move/comment")
     @ResponseBody
     public Response moveComment(
         @RequestParam String startingPosition,
@@ -55,7 +55,7 @@ public class MovesAPI
         }
     } 
 
-    @GetMapping
+    @GetMapping("/move/comments")
     @ResponseBody
     public Response getComments(
         @RequestParam String startingPosition,

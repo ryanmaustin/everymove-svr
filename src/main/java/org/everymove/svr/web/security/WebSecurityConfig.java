@@ -62,6 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             .authorizeRequests()
                 // Require Players to authenticate for Players-related actions
                 .antMatchers("/player/**").authenticated()
+                .antMatchers("/move/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
             .httpBasic()   

@@ -1,5 +1,6 @@
 package org.everymove.svr.main;
 
+import org.everymove.svr.main.repositories.MovesRepository;
 import org.everymove.svr.main.structs.Move;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
