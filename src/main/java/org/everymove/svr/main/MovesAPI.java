@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * API For Storing and Retrieving Comments on Chess Moves
+ */
 @Controller
 public class MovesAPI 
 {

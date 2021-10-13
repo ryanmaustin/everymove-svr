@@ -5,11 +5,40 @@ import java.util.List;
 
 public class Game 
 {
+    /**
+     * The Game ID
+     */
     private String id;
+
+    /**
+     * The Player playing white
+     */
     private Player white;
+
+    /**
+     * The Player playing black
+     */
     private Player black;
-    private List<Move> moves;    
+
+    /**
+     * List of successful Move Request made
+     */
+    private List<MoveRequest> moves;    
+
+    /**
+     * The Time that the Game started (Local to the Server)
+     */
     private LocalDateTime startTime;
+
+    /**
+     * The FEN Position of the Board
+     */
+    private String fen;
+
+    /**
+     * The ID of the Player who made the last move
+     */
+    private String lastMoveMadeBy;
 
     public Game()
     {
@@ -46,12 +75,12 @@ public class Game
         this.black = black;
     }
 
-    public List<Move> getMoves() 
+    public List<MoveRequest> getMoves() 
     {
         return this.moves;
     }
 
-    public void setMoves(List<Move> moves) 
+    public void setMoves(List<MoveRequest> moves) 
     {
         this.moves = moves;
     }
@@ -64,6 +93,26 @@ public class Game
     public void setStartTime(LocalDateTime startTime) 
     {
         this.startTime = startTime;
+    }
+
+    public String getFen() 
+    {
+        return this.fen;
+    }
+
+    public void setFen(String fen) 
+    {
+        this.fen = fen;
+    }
+
+    public String getLastMoveMadeBy()
+    {
+        return this.lastMoveMadeBy;
+    }
+    
+    public void setLastMoveMadeBy(String lastMoveMadeBy)
+    {
+        this.lastMoveMadeBy = lastMoveMadeBy;
     }
 
     public Game id(String id) 
@@ -84,7 +133,7 @@ public class Game
         return this;
     }
 
-    public Game moves(List<Move> moves) 
+    public Game moves(List<MoveRequest> moves) 
     {
         setMoves(moves);
         return this;
@@ -96,13 +145,27 @@ public class Game
         return this;
     }
 
+    public Game fen(String fen) 
+    {
+        setFen(fen);
+        return this;
+    }
+
+    public Game lastMoveMadeBy(String lastMoveMadeBy)
+    {
+        this.setLastMoveMadeBy(lastMoveMadeBy);
+        return this;
+    }
+
     public static Game fromExisting(Game game)
     {
         return new Game() 
             .startTime(game.startTime)
             .id(game.id)
             .black(game.black)
-            .white(game.white);
+            .white(game.white)
+            .moves(game.moves)
+            .fen(game.fen);
     }
 
 }

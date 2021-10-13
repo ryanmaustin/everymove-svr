@@ -13,6 +13,8 @@ public class Move
 
     private List<Comment> comments;
 
+    private int hits = 0;
+
     public Move() 
     {
         // empty
@@ -48,6 +50,15 @@ public class Move
         this.comments = comments;
     }
 
+    public int getHits()
+    {
+        return this.hits;
+    }
+
+    public void setHits(int hits)
+    {
+        this.hits = hits;
+    }
 
     public Move startingPosition(String startingPosition) 
     {
@@ -64,6 +75,13 @@ public class Move
     public Move comments(List<Comment> comments) 
     {
         setComments(comments);
+        return this;
+    }
+
+
+    public Move hits(int hits)
+    {
+        this.setHits(hits);
         return this;
     }
 

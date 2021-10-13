@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 public class PlayerProfile 
 {
     protected static final Logger log = LoggerFactory.getLogger(PlayerProfile.class);
+
+    private String playerId;
     
     @NotBlank
     @Pattern(regexp = "^[\\p{L} .'-]+$")
@@ -39,6 +41,16 @@ public class PlayerProfile
     public PlayerProfile() 
     {
         // empty
+    }
+
+    public String getPlayerId()
+    {
+        return this.playerId;
+    }
+
+    public void setPlayerId(String playerId)
+    {
+        this.playerId = playerId;
     }
 
     public String getFirstName() 
@@ -96,6 +108,12 @@ public class PlayerProfile
     public Credentials getCredentials()
     {
         return this.credentials;
+    }
+
+    public PlayerProfile playerId(String playerId)
+    {
+        this.setPlayerId(playerId);
+        return this;
     }
 
     public PlayerProfile credentials(Credentials credentials)
