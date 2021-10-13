@@ -36,7 +36,7 @@ public class GameAPI
         this.engine.requestNewGame(challenger, gameRequest);
     }
 
-    @MessageMapping("/game/accept")
+    @MessageMapping("/game/respond")
     public void acceptNewGame(
         SimpMessageHeaderAccessor sha, 
         @Payload GameRequest gameRequest,

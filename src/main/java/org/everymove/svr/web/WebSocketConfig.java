@@ -1,7 +1,10 @@
 package org.everymove.svr.web;
 
+import org.everymove.svr.main.repositories.PlayerProfileRepository;
+import org.everymove.svr.web.security.WebSocketHandshakeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -19,18 +22,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
 {   
     protected static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
+    @Autowired
+    private PlayerProfileRepository profileRepository;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) 
     {
         config.enableSimpleBroker("games");
         config.setApplicationDestinationPrefixes("/app");
-        config.setUserDestinationPrefix("/users");
+        config.setUserDestinationPrefix("/players");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) 
     {
-        registry.addEndpoint("/wsgame").setAllowedOrigins("http://localhost:4200").withSockJS();
+        registry.addEndpoint("/wsgame").setAllowedOrigins("http://localhost:4200").setHandshakeHandler(new WebSocketHandshakeHandler(profileRepository));
+        registry.addEndpoint("/wsgame").setAllowedOrigins("http://localhost:4200").setHandshakeHandler(new WebSocketHandshakeHandler(profileRepository)).withSockJS();
     }
 
     @EventListener
@@ -40,7 +47,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
         final String userDn = getUserDn(stompHeaderAccessor);
         final String sessionId = stompHeaderAccessor.getSessionId();
     
-        logger.info("Web Socket Disconnect -> Session Id: {}, User: {}",
+        logger.info(
+            "Web Socket Connected -> Session Id: {}, User: {}",
             sessionId,
             userDn
         );
@@ -53,7 +61,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
         final String userDn = getUserDn(stompHeaderAccessor);
         final String sessionId = stompHeaderAccessor.getSessionId();
 
-        logger.info("Web Socket Disconnect -> Instance Id: {}, User: {}",
+        logger.info(
+            "Web Socket Disconnected -> Instance Id: {}, User: {}",
             sessionId,
             userDn
         );

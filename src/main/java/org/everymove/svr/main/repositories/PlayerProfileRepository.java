@@ -6,5 +6,7 @@ public interface PlayerProfileRepository
 {
 
 	public Player get(String username);
+
+	public void add(Player player);
     
 }

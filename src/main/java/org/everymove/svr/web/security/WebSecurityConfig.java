@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 
 @SuppressWarnings("all")
@@ -27,17 +28,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     private AuthenticationService authenticationService;
     private UserDetailsService userDetailsService;
     private AuthenticatedPlayerLogoutHandler logoutHandler;
+    private AnonymousAuthenticationFilter guestFilter;
 
     @Autowired
     public WebSecurityConfig(
         AuthenticationService authenticationService,
         UserDetailsService userDetailsService,
-        AuthenticatedPlayerLogoutHandler logoutHandler
+        AuthenticatedPlayerLogoutHandler logoutHandler,
+        AnonymousAuthenticationFilter guestFilter
     ) 
     {
         this.authenticationService = authenticationService;
         this.userDetailsService = userDetailsService;
         this.logoutHandler = logoutHandler;
+        this.guestFilter = guestFilter;
     }
 
 	@Override
@@ -54,10 +58,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                 .logoutSuccessHandler(logoutHandler)
                 .permitAll()
                 .and()
+            .anonymous()
+                .authenticationFilter(guestFilter)
+                .and()
             .authorizeRequests()
                 // Allow home page and calendar to be reached without 
                 // requiring Players to be authenticated
-                .antMatchers("/").permitAll()
+                .antMatchers("/").authenticated()
                 .and()
             .authorizeRequests()
                 // Require Players to authenticate for Players-related actions
@@ -65,7 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/move/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
-            .httpBasic()   
+            .httpBasic()
                 .and()
             .csrf().disable();
             log.info("Web Security Configuration Loaded");

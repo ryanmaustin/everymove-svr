@@ -111,6 +111,7 @@ public class GameEngine
 
     public void requestNewGame(Principal challenger, GameRequest gameRequest) 
     {
+        logger.info("New Game Requested: {} to {}", gameRequest.getChallengerPlayerId(), gameRequest.getOpponentPlayerId());
         // Send a Request to the Opponent
         sendGameRequestToPlayer(
             gameRequest.getOpponentPlayerId(), 
