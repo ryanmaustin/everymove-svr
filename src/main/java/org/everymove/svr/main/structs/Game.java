@@ -1,7 +1,9 @@
 package org.everymove.svr.main.structs;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Game 
 {
@@ -43,6 +45,8 @@ public class Game
     public Game()
     {
         this.startTime = LocalDateTime.now();
+        this.id = UUID.randomUUID().toString();
+        this.moves = new ArrayList<>();
     }
 
     public String getId() 
@@ -168,4 +172,16 @@ public class Game
             .fen(game.fen);
     }
 
+    @Override
+    public int hashCode()
+    {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof Game)) return false;
+        return this.id.equals(((Game) o).id);
+    }
 }

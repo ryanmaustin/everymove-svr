@@ -47,7 +47,7 @@ public class GameAPI
         this.engine.acceptChallenge(opponent, gameRequest);
     }
 
-    @MessageMapping("/move")
+    @MessageMapping("/game/move")
     public void makeMove(
         SimpMessageHeaderAccessor sha, 
         @Payload MoveRequest moveRequest, 

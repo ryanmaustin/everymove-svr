@@ -3,7 +3,7 @@ package org.everymove.svr.web.security;
 import java.security.Principal;
 import java.util.Map;
 
-import org.everymove.svr.main.repositories.PlayerProfileRepository;
+import org.everymove.svr.main.repositories.PlayerRepository;
 import org.everymove.svr.main.structs.Guest;
 import org.everymove.svr.main.structs.Player;
 
@@ -17,10 +17,10 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 public class WebSocketHandshakeHandler extends DefaultHandshakeHandler
 {
 
-    private PlayerProfileRepository profileRepository;
+    private PlayerRepository profileRepository;
     
     @Autowired
-    public WebSocketHandshakeHandler(PlayerProfileRepository profileRepository)
+    public WebSocketHandshakeHandler(PlayerRepository profileRepository)
     {
         this.profileRepository = profileRepository;
     }

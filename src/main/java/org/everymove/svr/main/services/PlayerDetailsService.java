@@ -1,6 +1,6 @@
 package org.everymove.svr.main.services;
 
-import org.everymove.svr.main.repositories.PlayerProfileRepository;
+import org.everymove.svr.main.repositories.PlayerRepository;
 import org.everymove.svr.main.structs.Player;
 
 import org.slf4j.Logger;
@@ -16,10 +16,10 @@ public class PlayerDetailsService implements UserDetailsService
 {
     protected static final Logger log = LoggerFactory.getLogger(PlayerDetailsService.class);
 
-	private PlayerProfileRepository repo;
+	private PlayerRepository repo;
 
 	@Autowired
-    public PlayerDetailsService(PlayerProfileRepository repo) 
+    public PlayerDetailsService(PlayerRepository repo) 
     {
 		this.repo = repo;
     }

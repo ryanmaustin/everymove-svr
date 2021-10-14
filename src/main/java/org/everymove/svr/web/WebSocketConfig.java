@@ -1,6 +1,6 @@
 package org.everymove.svr.web;
 
-import org.everymove.svr.main.repositories.PlayerProfileRepository;
+import org.everymove.svr.main.repositories.PlayerRepository;
 import org.everymove.svr.web.security.WebSocketHandshakeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +23,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
     protected static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
     @Autowired
-    private PlayerProfileRepository profileRepository;
+    private PlayerRepository profileRepository;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) 
     {
-        config.enableSimpleBroker("games");
+        config.enableSimpleBroker("game");
         config.setApplicationDestinationPrefixes("/app");
         config.setUserDestinationPrefix("/players");
     }

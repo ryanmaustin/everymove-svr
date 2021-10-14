@@ -102,5 +102,16 @@ public class HumanPlayer implements Player
         return this.profile.getPlayerId();
     }
 
-    
+    @Override
+    public int hashCode()
+    {
+        return this.profile.getPlayerId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof HumanPlayer)) return false;
+        return ((HumanPlayer) o).getProfile().getPlayerId().equals(this.profile.getPlayerId());
+    }
 }

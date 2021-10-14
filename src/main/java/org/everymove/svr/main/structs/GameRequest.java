@@ -8,6 +8,7 @@ public class GameRequest
     private int clockInSeconds;
     private int incrementInSeconds;
     private boolean accepted = false;
+    private String gameId;
 
     public GameRequest() 
     {
@@ -77,6 +78,16 @@ public class GameRequest
     public void setAccepted(boolean accepted) 
     {
         this.accepted = accepted;
+    }
+
+    public String getGameId()
+    {
+        return this.gameId;
+    }
+
+    public void setGameId(String gameId)
+    {
+        this.gameId = gameId;
     }
 
 }
