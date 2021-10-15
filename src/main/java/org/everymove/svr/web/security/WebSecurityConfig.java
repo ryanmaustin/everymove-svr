@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             .authorizeRequests()
                 // Allow home page and calendar to be reached without 
                 // requiring Players to be authenticated
-                .antMatchers("/").authenticated()
+                .antMatchers("/*").permitAll()
                 .and()
             .authorizeRequests()
                 // Require Players to authenticate for Players-related actions

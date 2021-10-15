@@ -9,8 +9,11 @@ import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 
+import org.everymove.svr.main.engines.StockfishEngine;
 import org.everymove.svr.main.repositories.GameRepository;
 import org.everymove.svr.main.repositories.PlayerRepository;
+import org.everymove.svr.main.structs.Color;
+import org.everymove.svr.main.structs.Computer;
 import org.everymove.svr.main.structs.Game;
 import org.everymove.svr.main.structs.GameRequest;
 import org.everymove.svr.main.structs.MoveRequest;
@@ -25,16 +28,16 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 /**
- * Game Engine performs the following functions:
+ * This Game Manager performs the following functions:
  * - Initiates moves on behalf of players, ensuring that each move is legal
  * - Calls the Moves API to increment Hit Counts for every move
  * - Sends and Accepts new Game Requests on behalf of and for Players.
  * - Arbitrages the Stockfish Engine when the Player is challenging a computer
  */
 @Service
-public class GameEngine 
+public class GameManager 
 {
-    protected static final Logger logger = LoggerFactory.getLogger(GameEngine.class);
+    protected static final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
     private static final String GAME_MOVE_DEST = "game/move";
     private static final String GAME_REQUESTS_DEST = "game/requests";
@@ -43,19 +46,22 @@ public class GameEngine
     protected PlayerRepository players;
     protected PlayerQueue queue;
     protected SimpMessagingTemplate messenger;
+    protected StockfishEngine engine;
 
     @Autowired
-    public GameEngine(
+    public GameManager(
         GameRepository games, 
         PlayerRepository players, 
         PlayerQueue queue,
-        SimpMessagingTemplate messenger
+        SimpMessagingTemplate messenger,
+        StockfishEngine engine
     )
     {
         this.games = games;
         this.players = players;
         this.queue = queue;
         this.messenger = messenger;
+        this.engine = engine;
     }
 
     public void makeMove(MoveRequest moveRequest)
@@ -73,9 +79,24 @@ public class GameEngine
             game.setFen(board.getFen());
             logger.info("Move Made for Game [{}] -- {} to {}", moveRequest.getGameId(), moveRequest.getFrom(), moveRequest.getTo());
             tryToSaveGame(game);
-            tryToUpdateClients(game, moveRequest);            
+            sendMove(game, moveRequest);            
         }
         catch (Exception e) { this.handleMoveFailed(moveRequest, e); }
+    }
+
+    private boolean isNowComputersTurn(Game game)
+    {
+        String playerId = game.getLastMoveMadeBy();
+        
+        // If the next player is white and they are a computer, return true
+        if (game.getBlack().getName().equals(playerId))
+        {
+            return game.getWhite() instanceof Computer;
+        }
+        else // next player is black and a computer
+        {   
+            return game.getBlack() instanceof Computer;
+        }
     }
 
     private void handleMoveFailed(MoveRequest moveRequest, Exception e)
@@ -117,13 +138,38 @@ public class GameEngine
         board.doMove(move, true);
     }
 
-    protected void tryToUpdateClients(Game game, MoveRequest moveRequest)
+    /**
+     * Sends the given move to all players in a game. If the next
+     * turn is a computer, request the computer to make a move.
+     */
+    protected void sendMove(Game game, MoveRequest moveRequest)
     {
+        // Player vs Computer
+        if (againstComputer(game))
+        {
+            Player player = ChessUtil.getHuman(game);
+            sendMoveRequestToPlayer(player.getName(), moveRequest);
+
+            if (isNowComputersTurn(game))
+            {
+                Sleeper.sleep(200);
+                makeEngineMove(game);
+            }
+            return;
+        }
+        // Player vs Player
         String blackId = game.getBlack().getProfile().getPlayerId();
         String whiteId = game.getWhite().getProfile().getPlayerId();
 
         sendMoveRequestToPlayer(blackId, moveRequest);
         sendMoveRequestToPlayer(whiteId, moveRequest);
+    }
+
+    private boolean againstComputer(Game game)
+    {
+        if (game.getBlack() instanceof Computer) return true;
+        if (game.getWhite() instanceof Computer) return true;
+        return false;
     }
 
     protected void sendMoveRequestToPlayer(String playerId, MoveRequest moveRequest)
@@ -149,14 +195,16 @@ public class GameEngine
     {   
         Player player = (Player) challenger;
 
-        // Look for an Opponent
+        
+        // Enter match making. This thread will block until a match is found
         if (gameRequest.getOpponentPlayerId() == null)
         {
             waitForMatch(player, gameRequest);
         }
         else if (gameRequest.getOpponentPlayerId().equals("COMPUTER")) 
         {
-            // TODO: Handle computer
+            playAgainstComputer(player, gameRequest);
+            return;
         }
 
         resolveColor(gameRequest);
@@ -167,6 +215,44 @@ public class GameEngine
             gameRequest.getOpponentPlayerId(), 
             gameRequest
         );
+    }
+
+    /**
+     * Starts a New Game for the Player against a Computer
+     */
+    private void playAgainstComputer(Player player, GameRequest gameRequest)
+    {
+        Color playsAs = ChessUtil.randomColor();
+        Game game = new Game().againstComputer(player, playsAs, gameRequest.getRating());
+        game.setFen(new Board().getFen());
+
+        this.games.saveGame(game);
+
+        updateGameRequest(game, gameRequest, player);
+        sendGameRequestToPlayer(player.getName(), gameRequest);
+        Sleeper.sleep(500L);
+
+        if (playsAs.equals(Color.BLACK)) // make engine move for white
+        {
+            makeEngineMove(game); // move white
+        }
+    }
+
+    private void makeEngineMove(Game game)
+    {
+        Player computer = ChessUtil.getComputer(game);
+        if (!(computer instanceof Computer)) throw new IllegalStateException(computer.getName() + " is not a computer!");
+        String [] move = this.engine.getMove(game.getFen(), ((Computer) computer).getRating());
+        Color color = ChessUtil.getPlayerColor(game, computer);
+
+        MoveRequest moveRequest = new MoveRequest();
+            moveRequest.setFrom(move[0]);
+            moveRequest.setTo(move[1]);
+            moveRequest.setPromotionChoice(ChessUtil.parsePromotionChoice(color, move[2]));
+            moveRequest.setGameId(game.getId());
+            moveRequest.setPlayerId(computer.getName());
+
+        makeMove(moveRequest);
     }
 
     private void handleNewGame(GameRequest gameRequest)
@@ -205,7 +291,8 @@ public class GameEngine
      */
     private static void resolveColor(GameRequest request)
     {
-        if (request.getChallengerPlaysAs() == null) request.setChallengerPlaysAs(ChessUtil.randomColor());
+        if (request.getChallengerPlaysAs() == null) 
+            request.setChallengerPlaysAs(ChessUtil.randomColor().toString());
     }
 
     private void waitForMatch(Player player, GameRequest request)

@@ -9,6 +9,7 @@ public class GameRequest
     private int incrementInSeconds;
     private boolean accepted = false;
     private String gameId;
+    private int rating = 1000;
 
     public GameRequest() 
     {
@@ -63,6 +64,16 @@ public class GameRequest
     public void setIncrementInSeconds(int incrementInSeconds) 
     {
         this.incrementInSeconds = incrementInSeconds;
+    }
+
+    public void setRating(Integer rating)
+    {
+        if (rating != null) this.rating = rating;
+    }
+
+    public int getRating()
+    {
+        return this.rating;
     }
 
     public boolean isAccepted() 

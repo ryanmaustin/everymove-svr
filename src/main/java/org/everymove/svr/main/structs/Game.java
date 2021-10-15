@@ -172,6 +172,25 @@ public class Game
             .fen(game.fen);
     }
 
+    /**
+     * When playing against the computer, set the Computer
+     * to be opposite color.
+     */
+    public Game againstComputer(Player player, Color playsAs, int rating)
+    {
+        if (playsAs.equals(Color.WHITE))
+        {
+            setWhite(player);
+            setBlack(new Computer(rating));
+        }
+        else
+        {
+            setBlack(player);
+            setWhite(new Computer(rating));
+        }
+        return this;
+    }
+
     @Override
     public int hashCode()
     {

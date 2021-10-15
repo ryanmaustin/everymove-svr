@@ -16,10 +16,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 public class GameAPI 
 {
     protected SimpMessagingTemplate msgr;
-    protected GameEngine engine;
+    protected GameManager engine;
 
     @Autowired
-    public GameAPI(SimpMessagingTemplate msgr, GameEngine engine)
+    public GameAPI(SimpMessagingTemplate msgr, GameManager engine)
     {
         this.msgr = msgr;
         this.engine = engine;
