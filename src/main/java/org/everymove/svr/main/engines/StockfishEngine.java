@@ -29,7 +29,7 @@ public class StockfishEngine
      */
     public String [] getMove(String fen, int rating)
     {
-        logger.info("Generating Move for Fen [{}]", fen);
+        logger.info("Generating Move for Fen [{}] using ELO Rating [{}]", fen, rating);
         UCI uci = new UCI(120000L);
         uci.startStockfish();
         uci.setOption("MultiPV", "8");

@@ -3,7 +3,7 @@ package org.everymove.svr.main.structs;
 public class GameRequest 
 {
     private String challengerPlayerId;
-    private String challengerPlaysAs;
+    private Color challengerPlaysAs;
     private String opponentPlayerId;
     private int clockInSeconds;
     private int incrementInSeconds;
@@ -26,12 +26,12 @@ public class GameRequest
         this.challengerPlayerId = challengerPlayerId;
     }
 
-    public String getChallengerPlaysAs() 
+    public Color getChallengerPlaysAs() 
     {
         return this.challengerPlaysAs;
     }
 
-    public void setChallengerPlaysAs(String challengerPlaysAs) 
+    public void setChallengerPlaysAs(Color challengerPlaysAs) 
     {
         this.challengerPlaysAs = challengerPlaysAs;
     }

@@ -64,6 +64,9 @@ public class GameManager
         this.engine = engine;
     }
 
+    /**
+     * Handles a Move Request
+     */
     public void makeMove(MoveRequest moveRequest)
     {
         try
@@ -84,6 +87,9 @@ public class GameManager
         catch (Exception e) { this.handleMoveFailed(moveRequest, e); }
     }
 
+    /**
+     * Returns true if it is now the Computer's turn within a Game
+     */
     private boolean isNowComputersTurn(Game game)
     {
         String playerId = game.getLastMoveMadeBy();
@@ -99,6 +105,9 @@ public class GameManager
         }
     }
 
+    /**
+     * If a Move request was unsuccessful, log it here.
+     */
     private void handleMoveFailed(MoveRequest moveRequest, Exception e)
     {
         logger.error(
@@ -121,6 +130,9 @@ public class GameManager
         this.games.saveGame(game);
     }
 
+    /**
+     * Attempts the given move on the board.
+     */
     protected void tryToMove(Board board, MoveRequest moveRequest)
     {
         Move move = new Move(
@@ -148,11 +160,12 @@ public class GameManager
         if (againstComputer(game))
         {
             Player player = ChessUtil.getHuman(game);
+
+            Sleeper.sleep(333); // Sleep to simulate computer thinking
             sendMoveRequestToPlayer(player.getName(), moveRequest);
 
             if (isNowComputersTurn(game))
             {
-                Sleeper.sleep(200);
                 makeEngineMove(game);
             }
             return;
@@ -165,6 +178,9 @@ public class GameManager
         sendMoveRequestToPlayer(whiteId, moveRequest);
     }
 
+    /**
+     * Returns true if the given Game has a Computer in it
+     */
     private boolean againstComputer(Game game)
     {
         if (game.getBlack() instanceof Computer) return true;
@@ -172,6 +188,9 @@ public class GameManager
         return false;
     }
 
+    /**
+     * Sends a Move Request to a Player through Web Sockets
+     */
     protected void sendMoveRequestToPlayer(String playerId, MoveRequest moveRequest)
     {
         messenger.convertAndSendToUser(
@@ -222,7 +241,7 @@ public class GameManager
      */
     private void playAgainstComputer(Player player, GameRequest gameRequest)
     {
-        Color playsAs = ChessUtil.randomColor();
+        Color playsAs = gameRequest.getChallengerPlaysAs() == null ? ChessUtil.randomColor(): gameRequest.getChallengerPlaysAs();
         Game game = new Game().againstComputer(player, playsAs, gameRequest.getRating());
         game.setFen(new Board().getFen());
 
@@ -292,7 +311,7 @@ public class GameManager
     private static void resolveColor(GameRequest request)
     {
         if (request.getChallengerPlaysAs() == null) 
-            request.setChallengerPlaysAs(ChessUtil.randomColor().toString());
+            request.setChallengerPlaysAs(ChessUtil.randomColor());
     }
 
     private void waitForMatch(Player player, GameRequest request)
@@ -323,7 +342,7 @@ public class GameManager
     private void updateGameRequest(Game game, GameRequest request, Player player)
     {
         request.setOpponentPlayerId(ChessUtil.getOpponent(game, player).getName());
-        request.setChallengerPlaysAs(ChessUtil.getPlayerColor(game, player).toString());
+        request.setChallengerPlaysAs(ChessUtil.getPlayerColor(game, player));
         request.setGameId(game.getId());
 
         // Set accepted to true because a match means that both players

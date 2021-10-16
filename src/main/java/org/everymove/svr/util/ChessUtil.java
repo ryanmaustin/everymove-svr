@@ -31,7 +31,7 @@ public class ChessUtil
         String challenger = gameRequest.getChallengerPlayerId();
 
         // If Challenger is White
-        if (Color.valueOf(gameRequest.getChallengerPlaysAs().toUpperCase()).equals(Color.WHITE))
+        if (Color.WHITE.equals(gameRequest.getChallengerPlaysAs()))
         {
             return challenger;
         }
@@ -43,7 +43,7 @@ public class ChessUtil
         String challenger = gameRequest.getChallengerPlayerId();
 
         // If Challenger is Black
-        if (Color.valueOf(gameRequest.getChallengerPlaysAs().toUpperCase()).equals(Color.BLACK))
+        if (Color.BLACK.equals(gameRequest.getChallengerPlaysAs()))
         {
             return challenger;
         }
