@@ -15,4 +15,5 @@ public class SecurityConfig
     {
 	    return new BCryptPasswordEncoder(4, new SecureRandom());
 	}
+
 }

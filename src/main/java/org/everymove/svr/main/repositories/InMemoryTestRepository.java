@@ -12,12 +12,12 @@ import org.everymove.svr.main.structs.Player;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DynamoDBRepository implements MovesRepository, PlayerRepository, GameRepository
+public class InMemoryTestRepository implements MovesRepository, PlayerRepository, GameRepository
 {
     private Set<Game> games;
     private List<Player> players;
 
-    public DynamoDBRepository()
+    public InMemoryTestRepository()
     {
         this.games = new HashSet<>();
         this.players = new ArrayList<>();

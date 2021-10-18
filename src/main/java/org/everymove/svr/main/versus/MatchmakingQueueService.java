@@ -1,4 +1,4 @@
-package org.everymove.svr.main;
+package org.everymove.svr.main.versus;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * TODO: Make this an interface
+ * Eventually, this will be hosted on a dedicated server.
  */
 @Service
-public class PlayerQueue 
+public class MatchmakingQueueService implements MatchmakingQueue
 {
     private Queue<Player> inQueue;
 
@@ -62,7 +62,7 @@ public class PlayerQueue
     private GameRepository gameRepository;
 
     @Autowired
-    public PlayerQueue(GameRepository gameRepository)
+    public MatchmakingQueueService(GameRepository gameRepository)
     {
         inQueue = new LinkedList<>();
         matches = new HashMap<>();
@@ -120,7 +120,5 @@ public class PlayerQueue
         }
         return null; // no match at this time
     }
-
-
     
 }

@@ -18,6 +18,7 @@ import org.everymove.svr.main.structs.Game;
 import org.everymove.svr.main.structs.GameRequest;
 import org.everymove.svr.main.structs.MoveRequest;
 import org.everymove.svr.main.structs.Player;
+import org.everymove.svr.main.versus.MatchmakingQueue;
 import org.everymove.svr.util.ChessUtil;
 import org.everymove.svr.util.MatchTimeout;
 import org.everymove.svr.util.Sleeper;
@@ -39,12 +40,12 @@ public class GameManager
 {
     protected static final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
-    private static final String GAME_MOVE_DEST = "game/move";
-    private static final String GAME_REQUESTS_DEST = "game/requests";
+    protected static final String GAME_MOVE_DEST = "game/move";
+    protected static final String GAME_REQUESTS_DEST = "game/requests";
 
     protected GameRepository games;
     protected PlayerRepository players;
-    protected PlayerQueue queue;
+    protected MatchmakingQueue queue;
     protected SimpMessagingTemplate messenger;
     protected StockfishEngine engine;
 
@@ -52,7 +53,7 @@ public class GameManager
     public GameManager(
         GameRepository games, 
         PlayerRepository players, 
-        PlayerQueue queue,
+        MatchmakingQueue queue,
         SimpMessagingTemplate messenger,
         StockfishEngine engine
     )
@@ -72,6 +73,7 @@ public class GameManager
         try
         {
             Game game = tryToGetGame(moveRequest.getGameId());
+            if (game == null) return; // TODO: Manage this more gracefully
 
             Board board = new Board();
             board.loadFromFen(game.getFen());
@@ -171,8 +173,8 @@ public class GameManager
             return;
         }
         // Player vs Player
-        String blackId = game.getBlack().getProfile().getPlayerId();
-        String whiteId = game.getWhite().getProfile().getPlayerId();
+        String blackId = game.getBlack().getName();
+        String whiteId = game.getWhite().getName();
 
         sendMoveRequestToPlayer(blackId, moveRequest);
         sendMoveRequestToPlayer(whiteId, moveRequest);
@@ -213,7 +215,6 @@ public class GameManager
     public void requestNewGame(Principal challenger, GameRequest gameRequest) 
     {   
         Player player = (Player) challenger;
-
         
         // Enter match making. This thread will block until a match is found
         if (gameRequest.getOpponentPlayerId() == null)
@@ -257,7 +258,7 @@ public class GameManager
         }
     }
 
-    private void makeEngineMove(Game game)
+    protected void makeEngineMove(Game game)
     {
         Player computer = ChessUtil.getComputer(game);
         if (!(computer instanceof Computer)) throw new IllegalStateException(computer.getName() + " is not a computer!");

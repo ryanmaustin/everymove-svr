@@ -48,6 +48,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     protected void configure(HttpSecurity http) throws Exception 
     {
         http
+            .requiresChannel(channel -> 
+                channel.anyRequest().requiresSecure())
             .cors()
                 .and()
             .logout()
@@ -75,6 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             .httpBasic()
                 .and()
             .csrf().disable();
+
             log.info("Web Security Configuration Loaded");
     }
     
